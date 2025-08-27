@@ -94,113 +94,93 @@ public class Bridge {
             throw new BridgeException(INVALID_PARAMETER + " : Unknown action '" + actionName + "'", actionParsingException);
         }
 
-        switch (action) {
-            case SET_CONFIG:
-                setConfig(activity, parameters);
-                break;
-            case START:
-                start(activity);
-                break;
-            case STOP:
-                stop(activity);
-                break;
-            case DESTROY:
-                destroy(activity);
-                break;
-            case ON_NEW_INTENT:
-                onNewIntent(activity, getTypedParameter(parameters, "intent", Intent.class));
-                break;
-            case OPT_IN:
-                optIn(activity);
-                break;
-            case OPT_OUT:
-                optOut(activity, false);
-                break;
-            case OPT_OUT_AND_WIPE_DATA:
-                optOut(activity, true);
-                break;
-            case IS_OPTED_OUT:
-                return convertModernPromiseToLegacy(isOptedOut(activity));
-            case SET_FIND_INSTALLATION_ENABLED:
-                Batch.setFindMyInstallationEnabled(getTypedParameter(parameters, "enabled", Boolean.class));
-                break;
-            case UPDATE_AUTOMATIC_DATA_COLLECTION:
-                updateAutomaticDataCollection(parameters);
-                break;
-            case MESSAGING_SET_DO_NOT_DISTURB_ENABLED:
-                Batch.Messaging.setDoNotDisturbEnabled(getTypedParameter(parameters, "enabled", Boolean.class));
-                break;
-            case MESSAGING_SHOW_PENDING_MESSAGE:
-                showPendingMessage(activity);
-                break;
-            case PUSH_GET_LAST_KNOWN_TOKEN:
-                return SimplePromise.resolved(getLastKnownPushToken());
-            case PUSH_DISMISS_NOTIFICATIONS:
-                dismissNotifications();
-                break;
-            case PUSH_REGISTER:
-                // iOS only, do nothing
-                return null;
-            case PUSH_CLEAR_BADGE:
-                // iOS only, do nothing
-                return null;
-            case PUSH_SET_IOSNOTIF_TYPES:
-                // iOS only, do nothing
-                return null;
-            case PUSH_SET_ANDROIDNOTIF_TYPES:
-                setNotificationTypes(getTypedParameter(parameters, "notifTypes", Integer.class));
-                break;
-            case PUSH_SET_IOSSHOW_FOREGROUND:
-                // iOS only, do nothing
-                return null;
-            case PUSH_IOS_REFRESH_TOKEN:
-                // iOS only, do nothing
-                return null;
-            case PUSH_REQUEST_AUTHORIZATION:
-                requestAuthorization(activity);
-                break;
-            case PUSH_IOS_REQUEST_PROVISIONAL_AUTH:
-                // iOS only, do nothing
-                return null;
-            case PROFILE_IDENTIFY:
-                identify(parameters);
-                break;
-            case PROFILE_EDIT:
-                editProfileAttributes(parameters);
-                break;
-            case PROFILE_TRACK_EVENT:
-                return convertModernPromiseToLegacy(trackEvent(parameters));
-            case PROFILE_TRACK_LOCATION:
-                trackLocation(parameters);
-                break;
-            case USER_GET_INSTALLATION_ID:
-                return SimplePromise.resolved(Batch.User.getInstallationID());
-            case USER_GET_LANGUAGE:
-                return SimplePromise.resolved(Batch.User.getLanguage(activity));
-            case USER_GET_REGION:
-                return SimplePromise.resolved(Batch.User.getRegion(activity));
-            case USER_GET_IDENTIFIER:
-                return SimplePromise.resolved(Batch.User.getIdentifier(activity));
-            case USER_FETCH_ATTRIBUTES:
-                return convertModernPromiseToLegacy(userFetchAttributes(activity));
-            case USER_FETCH_TAGS:
-                return convertModernPromiseToLegacy(userFetchTags(activity));
-            case USER_CLEAR_INSTALL_DATA:
-                Batch.User.clearInstallationData();
-                break;
-            case INBOX_CREATE_INSTALLATION_FETCHER:
-            case INBOX_CREATE_USER_FETCHER:
-            case INBOX_RELEASE_FETCHER:
-            case INBOX_FETCH_NEW_NOTIFICATIONS:
-            case INBOX_FETCH_NEXT_PAGE:
-            case INBOX_GET_FETCHED_NOTIFICATIONS:
-            case INBOX_MARK_AS_READ:
-            case INBOX_MARK_ALL_AS_READ:
-            case INBOX_MARK_AS_DELETED:
-            case INBOX_DISPLAY_LANDING_MESSAGE:
-                return inboxBridge.compatDoAction(action, parameters, activity);
-            default:
-                throw new BridgeException(INVALID_PARAMETER + " : Action '" + actionName + "' is known, but not implemented");
+        if (action == Action.SET_CONFIG) {
+            setConfig(activity, parameters);
+        } else if (action == Action.START) {
+            start(activity);
+        } else if (action == Action.STOP) {
+            stop(activity);
+        } else if (action == Action.DESTROY) {
+            destroy(activity);
+        } else if (action == Action.ON_NEW_INTENT) {
+            onNewIntent(activity, getTypedParameter(parameters, "intent", Intent.class));
+        } else if (action == Action.OPT_IN) {
+            optIn(activity);
+        } else if (action == Action.OPT_OUT) {
+            optOut(activity, false);
+        } else if (action == Action.OPT_OUT_AND_WIPE_DATA) {
+            optOut(activity, true);
+        } else if (action == Action.IS_OPTED_OUT) {
+            return convertModernPromiseToLegacy(isOptedOut(activity));
+        } else if (action == Action.SET_FIND_INSTALLATION_ENABLED) {
+            Batch.setFindMyInstallationEnabled(getTypedParameter(parameters, "enabled", Boolean.class));
+        } else if (action == Action.UPDATE_AUTOMATIC_DATA_COLLECTION) {
+            updateAutomaticDataCollection(parameters);
+        } else if (action == Action.MESSAGING_SET_DO_NOT_DISTURB_ENABLED) {
+            Batch.Messaging.setDoNotDisturbEnabled(getTypedParameter(parameters, "enabled", Boolean.class));
+        } else if (action == Action.MESSAGING_SHOW_PENDING_MESSAGE) {
+            showPendingMessage(activity);
+        } else if (action == Action.PUSH_GET_LAST_KNOWN_TOKEN) {
+            return SimplePromise.resolved(getLastKnownPushToken());
+        } else if (action == Action.PUSH_DISMISS_NOTIFICATIONS) {
+            dismissNotifications();
+        } else if (action == Action.PUSH_REGISTER) {
+            // iOS only, do nothing
+            return null;
+        } else if (action == Action.PUSH_CLEAR_BADGE) {
+            // iOS only, do nothing
+            return null;
+        } else if (action == Action.PUSH_SET_IOSNOTIF_TYPES) {
+            // iOS only, do nothing
+            return null;
+        } else if (action == Action.PUSH_SET_ANDROIDNOTIF_TYPES) {
+            setNotificationTypes(getTypedParameter(parameters, "notifTypes", Integer.class));
+        } else if (action == Action.PUSH_SET_IOSSHOW_FOREGROUND) {
+            // iOS only, do nothing
+            return null;
+        } else if (action == Action.PUSH_IOS_REFRESH_TOKEN) {
+            // iOS only, do nothing
+            return null;
+        } else if (action == Action.PUSH_REQUEST_AUTHORIZATION) {
+            requestAuthorization(activity);
+        } else if (action == Action.PUSH_IOS_REQUEST_PROVISIONAL_AUTH) {
+            // iOS only, do nothing
+            return null;
+        } else if (action == Action.PROFILE_IDENTIFY) {
+            identify(parameters);
+        } else if (action == Action.PROFILE_EDIT) {
+            editProfileAttributes(parameters);
+        } else if (action == Action.PROFILE_TRACK_EVENT) {
+            return convertModernPromiseToLegacy(trackEvent(parameters));
+        } else if (action == Action.PROFILE_TRACK_LOCATION) {
+            trackLocation(parameters);
+        } else if (action == Action.USER_GET_INSTALLATION_ID) {
+            return SimplePromise.resolved(Batch.User.getInstallationID());
+        } else if (action == Action.USER_GET_LANGUAGE) {
+            return SimplePromise.resolved(Batch.User.getLanguage(activity));
+        } else if (action == Action.USER_GET_REGION) {
+            return SimplePromise.resolved(Batch.User.getRegion(activity));
+        } else if (action == Action.USER_GET_IDENTIFIER) {
+            return SimplePromise.resolved(Batch.User.getIdentifier(activity));
+        } else if (action == Action.USER_FETCH_ATTRIBUTES) {
+            return convertModernPromiseToLegacy(userFetchAttributes(activity));
+        } else if (action == Action.USER_FETCH_TAGS) {
+            return convertModernPromiseToLegacy(userFetchTags(activity));
+        } else if (action == Action.USER_CLEAR_INSTALL_DATA) {
+            Batch.User.clearInstallationData();
+        } else if (action == Action.INBOX_CREATE_INSTALLATION_FETCHER ||
+                action == Action.INBOX_CREATE_USER_FETCHER ||
+                action == Action.INBOX_RELEASE_FETCHER ||
+                action == Action.INBOX_FETCH_NEW_NOTIFICATIONS ||
+                action == Action.INBOX_FETCH_NEXT_PAGE ||
+                action == Action.INBOX_GET_FETCHED_NOTIFICATIONS ||
+                action == Action.INBOX_MARK_AS_READ ||
+                action == Action.INBOX_MARK_ALL_AS_READ ||
+                action == Action.INBOX_MARK_AS_DELETED ||
+                action == Action.INBOX_DISPLAY_LANDING_MESSAGE) {
+            return inboxBridge.compatDoAction(action, parameters, activity);
+        } else {
+            throw new BridgeException(INVALID_PARAMETER + " : Action '" + actionName + "' is known, but not implemented");
         }
 
         return null;
@@ -366,134 +346,120 @@ public class Bridge {
             for (Map<String, Object> operationDescription : operations) {
                 String operationName = getTypedParameter(operationDescription, "operation", String.class);
 
-                switch (operationName) {
-                    case "SET_LANGUAGE" -> {
-                        Object value = operationDescription.get("value");
-                        if (value != null && !(value instanceof String)) {
-                            Log.e(TAG, "Invalid SET_LANGUAGE value: it can only be a string or null");
-                            // Invalid value, continue. NULL is allowed though
-                            continue;
-                        }
-                        editor.setLanguage((String) value);
+                if ("SET_LANGUAGE".equals(operationName)) {
+                    Object value = operationDescription.get("value");
+                    if (value != null && !(value instanceof String)) {
+                        Log.e(TAG, "Invalid SET_LANGUAGE value: it can only be a string or null");
+                        // Invalid value, continue. NULL is allowed though
+                        continue;
                     }
-                    case "SET_REGION" -> {
-                        Object value = operationDescription.get("value");
-                        if (value != null && !(value instanceof String)) {
-                            Log.e(TAG, "Invalid SET_REGION value: it can only be a string or null");
-                            // Invalid value, continue. NULL is allowed though
-                            continue;
-                        }
-                        editor.setRegion((String) value);
+                    editor.setLanguage((String) value);
+                } else if ("SET_REGION".equals(operationName)) {
+                    Object value = operationDescription.get("value");
+                    if (value != null && !(value instanceof String)) {
+                        Log.e(TAG, "Invalid SET_REGION value: it can only be a string or null");
+                        // Invalid value, continue. NULL is allowed though
+                        continue;
                     }
-                    case "SET_EMAIL_ADDRESS" -> {
-                        Object value = operationDescription.get("value");
-                        if (value != null && !(value instanceof String)) {
-                            Log.e(TAG, "Invalid SET_EMAIL value: it can only be a string or null");
-                            // Invalid value, continue. NULL is allowed though
-                            continue;
-                        }
-                        editor.setEmailAddress((String) value);
+                    editor.setRegion((String) value);
+                } else if ("SET_EMAIL_ADDRESS".equals(operationName)) {
+                    Object value = operationDescription.get("value");
+                    if (value != null && !(value instanceof String)) {
+                        Log.e(TAG, "Invalid SET_EMAIL value: it can only be a string or null");
+                        // Invalid value, continue. NULL is allowed though
+                        continue;
                     }
-                    case "SET_EMAIL_MARKETING_SUB" -> {
-                        Object value = operationDescription.get("value");
-                        if (value == null || !(value instanceof String)) {
-                            Log.e(TAG, "Invalid SET_EMAIL_MARKETING_SUB value: it can only be a string");
-                            // Invalid value, continue.
-                            continue;
-                        }
-
-                        if ("subscribed".equals(value)) {
-                            editor.setEmailMarketingSubscription(BatchEmailSubscriptionState.SUBSCRIBED);
-                        } else if ("unsubscribed".equals(value)) {
-                            editor.setEmailMarketingSubscription(BatchEmailSubscriptionState.UNSUBSCRIBED);
-                        } else {
-                            Log.e(TAG, "Invalid SET_EMAIL_MARKETING_SUBSCRIPTION value: it can only be `subscribed` or `unsubscribed`.");
-                        }
+                    editor.setEmailAddress((String) value);
+                } else if ("SET_EMAIL_MARKETING_SUB".equals(operationName)) {
+                    Object value = operationDescription.get("value");
+                    if (value == null || !(value instanceof String)) {
+                        Log.e(TAG, "Invalid SET_EMAIL_MARKETING_SUB value: it can only be a string");
+                        // Invalid value, continue.
+                        continue;
                     }
-                    case "SET_ATTRIBUTE" -> {
-                        String key = getTypedParameter(operationDescription, "key", String.class);
-                        String type = getTypedParameter(operationDescription, "type", String.class);
 
-                        switch (type) {
-                            case "string" ->
-                                    editor.setAttribute(key, getTypedParameter(operationDescription, "value", String.class));
-                            case "url" -> {
-                                try {
-                                    editor.setAttribute(key, new URI(getTypedParameter(operationDescription, "value", String.class)));
-                                } catch (URISyntaxException e) {
-                                    Log.e(TAG, "Invalid SET_ATTRIBUTE url value: couldn't parse value", e);
-                                }
-                            }
-                            case "date" ->
-                                    editor.setAttribute(key, new Date(getTypedParameter(operationDescription, "value", Number.class).longValue()));
-                            case "integer" -> {
-                                Object rawValue = operationDescription.get("value");
+                    if ("subscribed".equals(value)) {
+                        editor.setEmailMarketingSubscription(BatchEmailSubscriptionState.SUBSCRIBED);
+                    } else if ("unsubscribed".equals(value)) {
+                        editor.setEmailMarketingSubscription(BatchEmailSubscriptionState.UNSUBSCRIBED);
+                    } else {
+                        Log.e(TAG, "Invalid SET_EMAIL_MARKETING_SUBSCRIPTION value: it can only be `subscribed` or `unsubscribed`.");
+                    }
+                } else if ("SET_ATTRIBUTE".equals(operationName)) {
+                    String key = getTypedParameter(operationDescription, "key", String.class);
+                    String type = getTypedParameter(operationDescription, "type", String.class);
 
-                                if (rawValue instanceof Number) {
-                                    editor.setAttribute(key, ((Number) rawValue).longValue());
-                                } else if (rawValue instanceof String) {
-                                    try {
-                                        editor.setAttribute(key, Long.parseLong((String) rawValue));
-                                    } catch (NumberFormatException e) {
-                                        Log.e(TAG, "Invalid SET_ATTRIBUTE integer value: couldn't parse value", e);
-                                    }
-                                }
-                            }
-                            case "float" -> {
-                                Object rawValue = operationDescription.get("value");
+                    if ("string".equals(type)) {
+                        editor.setAttribute(key, getTypedParameter(operationDescription, "value", String.class));
+                    } else if ("url".equals(type)) {
+                        try {
+                            editor.setAttribute(key, new URI(getTypedParameter(operationDescription, "value", String.class)));
+                        } catch (URISyntaxException e) {
+                            Log.e(TAG, "Invalid SET_ATTRIBUTE url value: couldn't parse value", e);
+                        }
+                    } else if ("date".equals(type)) {
+                        editor.setAttribute(key, new Date(getTypedParameter(operationDescription, "value", Number.class).longValue()));
+                    } else if ("integer".equals(type)) {
+                        Object rawValue = operationDescription.get("value");
 
-                                if (rawValue instanceof Number) {
-                                    editor.setAttribute(key, ((Number) rawValue).doubleValue());
-                                } else if (rawValue instanceof String) {
-                                    try {
-                                        editor.setAttribute(key, Double.parseDouble((String) rawValue));
-                                    } catch (NumberFormatException e) {
-                                        Log.e(TAG, "Invalid SET_ATTRIBUTE float value: couldn't parse value", e);
-                                    }
-                                }
-                            }
-                            case "boolean" -> {
-                                Object rawValue = operationDescription.get("value");
-
-                                if (rawValue instanceof Boolean) {
-                                    editor.setAttribute(key, (Boolean) rawValue);
-                                } else if (rawValue instanceof String) {
-                                    try {
-                                        editor.setAttribute(key, Boolean.parseBoolean((String) rawValue));
-                                    } catch (NumberFormatException e) {
-                                        Log.e(TAG, "Invalid SET_ATTRIBUTE boolean value: couldn't parse value", e);
-                                    }
-                                }
-                            }
-                            case "array" -> {
-                                List<String> value = getTypedParameter(operationDescription, "value", ArrayList.class);
-                                if (value != null) {
-                                    editor.setAttribute(key, new ArrayList<String>(value));
-                                }
+                        if (rawValue instanceof Number) {
+                            editor.setAttribute(key, ((Number) rawValue).longValue());
+                        } else if (rawValue instanceof String) {
+                            try {
+                                editor.setAttribute(key, Long.parseLong((String) rawValue));
+                            } catch (NumberFormatException e) {
+                                Log.e(TAG, "Invalid SET_ATTRIBUTE integer value: couldn't parse value", e);
                             }
                         }
-                    }
-                    case "REMOVE_ATTRIBUTE" ->
-                            editor.removeAttribute(getTypedParameter(operationDescription, "key", String.class));
-                    case "ADD_TO_ARRAY" -> {
-                        String key = getTypedParameter(operationDescription, "key", String.class);
-                        String value = getOptionalTypedParameter(operationDescription, "value", String.class, null);
-                        List<String> arrayValue = getOptionalTypedParameter(operationDescription, "value", ArrayList.class, null);
+                    } else if ("float".equals(type)) {
+                        Object rawValue = operationDescription.get("value");
+
+                        if (rawValue instanceof Number) {
+                            editor.setAttribute(key, ((Number) rawValue).doubleValue());
+                        } else if (rawValue instanceof String) {
+                            try {
+                                editor.setAttribute(key, Double.parseDouble((String) rawValue));
+                            } catch (NumberFormatException e) {
+                                Log.e(TAG, "Invalid SET_ATTRIBUTE float value: couldn't parse value", e);
+                            }
+                        }
+                    } else if ("boolean".equals(type)) {
+                        Object rawValue = operationDescription.get("value");
+
+                        if (rawValue instanceof Boolean) {
+                            editor.setAttribute(key, (Boolean) rawValue);
+                        } else if (rawValue instanceof String) {
+                            try {
+                                editor.setAttribute(key, Boolean.parseBoolean((String) rawValue));
+                            } catch (NumberFormatException e) {
+                                Log.e(TAG, "Invalid SET_ATTRIBUTE boolean value: couldn't parse value", e);
+                            }
+                        }
+                    } else if ("array".equals(type)) {
+                        List<String> value = getTypedParameter(operationDescription, "value", ArrayList.class);
                         if (value != null) {
-                            editor.addToArray(key, value);
-                        } else if (arrayValue != null){
-                            editor.addToArray(key, new ArrayList<>(arrayValue));
+                            editor.setAttribute(key, new ArrayList<String>(value));
                         }
                     }
-                    case "REMOVE_FROM_ARRAY" -> {
-                        String key = getTypedParameter(operationDescription, "key", String.class);
-                        String value = getOptionalTypedParameter(operationDescription, "value", String.class, null);
-                        List<String> arrayValue = getOptionalTypedParameter(operationDescription, "value", ArrayList.class, null);
-                        if (value != null) {
-                            editor.removeFromArray(key, value);
-                        } else if (arrayValue != null){
-                            editor.removeFromArray(key, new ArrayList<>(arrayValue));
-                        }
+                } else if ("REMOVE_ATTRIBUTE".equals(operationName)) {
+                    editor.removeAttribute(getTypedParameter(operationDescription, "key", String.class));
+                } else if ("ADD_TO_ARRAY".equals(operationName)) {
+                    String key = getTypedParameter(operationDescription, "key", String.class);
+                    String value = getOptionalTypedParameter(operationDescription, "value", String.class, null);
+                    List<String> arrayValue = getOptionalTypedParameter(operationDescription, "value", ArrayList.class, null);
+                    if (value != null) {
+                        editor.addToArray(key, value);
+                    } else if (arrayValue != null){
+                        editor.addToArray(key, new ArrayList<>(arrayValue));
+                    }
+                } else if ("REMOVE_FROM_ARRAY".equals(operationName)) {
+                    String key = getTypedParameter(operationDescription, "key", String.class);
+                    String value = getOptionalTypedParameter(operationDescription, "value", String.class, null);
+                    List<String> arrayValue = getOptionalTypedParameter(operationDescription, "value", ArrayList.class, null);
+                    if (value != null) {
+                        editor.removeFromArray(key, value);
+                    } else if (arrayValue != null){
+                        editor.removeFromArray(key, new ArrayList<>(arrayValue));
                     }
                 }
             }
@@ -586,41 +552,34 @@ public class Bridge {
 
                         String type;
                         Object value = attribute.value;
-                        switch (attribute.type) {
-                            case BOOL:
-                                type = "b";
-                                break;
-                            case DATE: {
-                                type = "d";
-                                Date dateValue = attribute.getDateValue();
-                                if (dateValue == null) {
-                                    promise.reject(new BridgeException("Fetch attribute: Could not parse date for key: " + attributeEntry.getKey()));
-                                    return;
-                                }
-                                value = dateValue.getTime();
-                                break;
-                            }
-                            case STRING:
-                                type = "s";
-                                break;
-                            case LONGLONG:
-                                type = "i";
-                                break;
-                            case DOUBLE:
-                                type = "f";
-                                break;
-                            case URL:
-                                type = "u";
-                                URI uriValue = attribute.getUriValue();
-                                if (uriValue == null) {
-                                    promise.reject(new BridgeException("Fetch attribute: Could not parse URL for key: " + attributeEntry.getKey()));
-                                    return;
-                                }
-                                value = uriValue.toString();
-                                break;
-                            default:
-                                promise.reject(new BridgeException("Fetch attribute: Unknown attribute type " + attribute.type + " for key: " + attributeEntry.getKey()));
+
+                        if (attribute.type == BatchUserAttribute.Type.BOOL) {
+                            type = "b";
+                        } else if (attribute.type == BatchUserAttribute.Type.DATE) {
+                            type = "d";
+                            Date dateValue = attribute.getDateValue();
+                            if (dateValue == null) {
+                                promise.reject(new BridgeException("Fetch attribute: Could not parse date for key: " + attributeEntry.getKey()));
                                 return;
+                            }
+                            value = dateValue.getTime();
+                        } else if (attribute.type == BatchUserAttribute.Type.STRING) {
+                            type = "s";
+                        } else if (attribute.type == BatchUserAttribute.Type.LONGLONG) {
+                            type = "i";
+                        } else if (attribute.type == BatchUserAttribute.Type.DOUBLE) {
+                            type = "f";
+                        } else if (attribute.type == BatchUserAttribute.Type.URL) {
+                            type = "u";
+                            URI uriValue = attribute.getUriValue();
+                            if (uriValue == null) {
+                                promise.reject(new BridgeException("Fetch attribute: Could not parse URL for key: " + attributeEntry.getKey()));
+                                return;
+                            }
+                            value = uriValue.toString();
+                        } else {
+                            promise.reject(new BridgeException("Fetch attribute: Unknown attribute type " + attribute.type + " for key: " + attributeEntry.getKey()));
+                            return;
                         }
 
                         typedBrdigeAttribute.put("type", type);
