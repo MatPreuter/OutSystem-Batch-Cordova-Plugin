@@ -62,13 +62,18 @@ public class BridgeUtils {
             for (Map.Entry<String, Object> attributeEntry : eventData.entrySet()) {
                 Object entryKey = attributeEntry.getKey();
                 Object entryValue = attributeEntry.getValue();
-                if (!(entryKey instanceof String entryStringKey)) {
+                // --- Change for Java 8 compatibility: Replaced pattern matching for instanceof with a traditional check and cast. ---
+                if (!(entryKey instanceof String)) {
                     continue;
                 }
+                String entryStringKey = (String) entryKey;
+
                 if (!(entryValue instanceof Map)) {
                     continue;
                 }
                 Map<String, Object> entryMapValue = (Map<String, Object>) entryValue;
+                // --- End of change ---
+
                 String type = getTypedParameter(entryMapValue, "type", String.class);
 
                 if ("s".equals(type)) {
@@ -120,30 +125,41 @@ public class BridgeUtils {
     public static SimplePromise<String> convertModernPromiseToLegacy(@NonNull SimplePromise<Object> originalPromise) {
         SimplePromise<String> resultPromise = new SimplePromise<>();
 
-        originalPromise.then(value -> {
-            Object finalValue = value;
-            if (value instanceof Map) {
-                try {
-                    finalValue = JSONHelper.fromMap((Map) value);
-                } catch (JSONException e) {
-                    Log.d("BatchBridge", "Could not convert error", e);
-                    finalValue = "{'error':'Internal native error (-1100)', 'code': -1100}";
+        // --- Change for Java 8 compatibility: Replaced lambda expression with anonymous inner class. ---
+        originalPromise.then(new SimplePromise.OnSuccessListener<Object>() {
+            @Override
+            public void onSuccess(Object value) {
+                Object finalValue = value;
+                if (value instanceof Map) {
+                    try {
+                        finalValue = JSONHelper.fromMap((Map) value);
+                    } catch (JSONException e) {
+                        Log.d("BatchBridge", "Could not convert error", e);
+                        finalValue = "{'error':'Internal native error (-1100)', 'code': -1100}";
+                    }
                 }
+                resultPromise.resolve(finalValue != null ? finalValue.toString() : null);
             }
-            resultPromise.resolve(finalValue != null ? finalValue.toString() : null);
         });
-        originalPromise.catchException(e -> {
-            String finalValue;
-            try {
-                JSONObject errorObject = new JSONObject();
-                errorObject.put("error", e.getMessage());
-                errorObject.put("code", -1101); // Error codes are not yet supported on Android
-                finalValue = errorObject.toString();
-            } catch (JSONException jsonException) {
-                finalValue = "{'error':'Internal native error (-1200)', 'code': -1200}";
+        // --- End of change ---
+
+        // --- Change for Java 8 compatibility: Replaced lambda expression with anonymous inner class. ---
+        originalPromise.catchException(new SimplePromise.OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                String finalValue;
+                try {
+                    JSONObject errorObject = new JSONObject();
+                    errorObject.put("error", e.getMessage());
+                    errorObject.put("code", -1101); // Error codes are not yet supported on Android
+                    finalValue = errorObject.toString();
+                } catch (JSONException jsonException) {
+                    finalValue = "{'error':'Internal native error (-1200)', 'code': -1200}";
+                }
+                resultPromise.resolve(finalValue);
             }
-            resultPromise.resolve(finalValue);
         });
+        // --- End of change ---
         return resultPromise;
     }
 }
