@@ -62,13 +62,17 @@ public class BridgeUtils {
             for (Map.Entry<String, Object> attributeEntry : eventData.entrySet()) {
                 Object entryKey = attributeEntry.getKey();
                 Object entryValue = attributeEntry.getValue();
-                if (!(entryKey instanceof String entryStringKey)) {
+
+                if (!(entryKey instanceof String)) {
                     continue;
                 }
+                String entryStringKey = (String) entryKey;
+
                 if (!(entryValue instanceof Map)) {
                     continue;
                 }
                 Map<String, Object> entryMapValue = (Map<String, Object>) entryValue;
+
                 String type = getTypedParameter(entryMapValue, "type", String.class);
 
                 if ("s".equals(type)) {
