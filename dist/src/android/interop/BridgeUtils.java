@@ -71,44 +71,40 @@ public class BridgeUtils {
                 Map<String, Object> entryMapValue = (Map<String, Object>) entryValue;
                 String type = getTypedParameter(entryMapValue, "type", String.class);
 
-                switch (type) {
-                    case "s" ->
-                            batchEventAttributes.put(entryStringKey, getTypedParameter(entryMapValue, "value", String.class));
-                    case "b" ->
-                            batchEventAttributes.put(entryStringKey, getTypedParameter(entryMapValue, "value", Boolean.class));
-                    case "i" ->
-                            batchEventAttributes.put(entryStringKey, getTypedParameter(entryMapValue, "value", Number.class).longValue());
-                    case "f" ->
-                            batchEventAttributes.put(entryStringKey, getTypedParameter(entryMapValue, "value", Number.class).doubleValue());
-                    case "d" -> {
-                        long timestamp = getTypedParameter(entryMapValue, "value", Number.class).longValue();
-                        batchEventAttributes.put(entryStringKey, new Date(timestamp));
+                if ("s".equals(type)) {
+                    batchEventAttributes.put(entryStringKey, getTypedParameter(entryMapValue, "value", String.class));
+                } else if ("b".equals(type)) {
+                    batchEventAttributes.put(entryStringKey, getTypedParameter(entryMapValue, "value", Boolean.class));
+                } else if ("i".equals(type)) {
+                    batchEventAttributes.put(entryStringKey, getTypedParameter(entryMapValue, "value", Number.class).longValue());
+                } else if ("f".equals(type)) {
+                    batchEventAttributes.put(entryStringKey, getTypedParameter(entryMapValue, "value", Number.class).doubleValue());
+                } else if ("d".equals(type)) {
+                    long timestamp = getTypedParameter(entryMapValue, "value", Number.class).longValue();
+                    batchEventAttributes.put(entryStringKey, new Date(timestamp));
+                } else if ("u".equals(type)) {
+                    String rawURI = getTypedParameter(entryMapValue, "value", String.class);
+                    try {
+                        batchEventAttributes.put(entryStringKey, new URI(rawURI));
+                    } catch (URISyntaxException e) {
+                        throw new BridgeException("Invalid parameter: Bad URL event data syntax", e);
                     }
-                    case "u" -> {
-                        String rawURI = getTypedParameter(entryMapValue, "value", String.class);
-                        try {
-                            batchEventAttributes.put(entryStringKey, new URI(rawURI));
-                        } catch (URISyntaxException e) {
-                            throw new BridgeException("Invalid parameter: Bad URL event data syntax", e);
+                } else if ("o".equals(type)) {
+                    batchEventAttributes.put(entryStringKey, convertSerializedEventDataToEventAttributes(getTypedParameter(entryMapValue, "value", Map.class)));
+                } else if ("sa".equals(type)) {
+                    batchEventAttributes.putStringList(entryStringKey, getTypedParameter(entryMapValue, "value", List.class));
+                } else if ("oa".equals(type)) {
+                    List<BatchEventAttributes> eventAttributesList = new ArrayList<>();
+                    List<Map<String, Object>> list = getTypedParameter(entryMapValue, "value", List.class);
+                    for (int i = 0; i < list.size(); i++) {
+                        BatchEventAttributes object = convertSerializedEventDataToEventAttributes(list.get(i));
+                        if (object != null) {
+                            eventAttributesList.add(object);
                         }
                     }
-                    case "o" ->
-                            batchEventAttributes.put(entryStringKey, convertSerializedEventDataToEventAttributes(getTypedParameter(entryMapValue, "value", Map.class)));
-                    case "sa" ->
-                            batchEventAttributes.putStringList(entryStringKey, getTypedParameter(entryMapValue, "value", List.class));
-                    case "oa" -> {
-                        List<BatchEventAttributes> eventAttributesList = new ArrayList<>();
-                        List<Map<String, Object>> list = getTypedParameter(entryMapValue, "value", List.class);
-                        for (int i = 0; i < list.size(); i++) {
-                            BatchEventAttributes object = convertSerializedEventDataToEventAttributes(list.get(i));
-                            if (object != null) {
-                                eventAttributesList.add(object);
-                            }
-                        }
-                        batchEventAttributes.putObjectList(entryStringKey, eventAttributesList);
-                    }
-                    default ->
-                            throw new BridgeException("Invalid parameter: Unknown event_data.attributes type");
+                    batchEventAttributes.putObjectList(entryStringKey, eventAttributesList);
+                } else {
+                    throw new BridgeException("Invalid parameter: Unknown event_data.attributes type");
                 }
             }
         }
