@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import com.batch.android.Batch;
 import com.batch.android.BatchInboxFetcher;
 import com.batch.android.BatchInboxNotificationContent;
-import com.batch.android.BatchInboxNotificationSource;
 import com.batch.android.json.JSONException;
 import com.batch.android.json.JSONObject;
 
